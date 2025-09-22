@@ -4,30 +4,24 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 def draw_cat_plot():
-    # 1) Import the data
+    
     df = pd.read_csv("medical_examination.csv")
 
-    # 2) Add 'overweight' column
     # BMI = weight(kg) / (height(m))^2
     bmi = df['weight'] / ((df['height'] / 100) ** 2)
     df['overweight'] = (bmi > 25).astype(int)
 
-    # 3) Normalize 'cholesterol' and 'gluc' to 0 (good) and 1 (bad)
     df['cholesterol'] = (df['cholesterol'] > 1).astype(int)
     df['gluc'] = (df['gluc'] > 1).astype(int)
 
-    # 4) Draw the categorical plot
-    # 5) Create DataFrame for cat plot using pd.melt()
     df_cat = pd.melt(
         df,
         id_vars=['cardio'],
         value_vars=['cholesterol', 'gluc', 'smoke', 'alco', 'active', 'overweight']
     )
 
-    # 6) Group and reformat the data to show counts of each feature split by cardio
     df_cat = df_cat.groupby(['cardio', 'variable', 'value']).size().reset_index(name='total')
 
-    # 7) Draw the catplot using seaborn
     catplot = sns.catplot(
         data=df_cat,
         x='variable',
@@ -42,16 +36,13 @@ def draw_cat_plot():
     catplot.set_axis_labels("variable", "total")
     catplot._legend.set_title("value")
 
-    # 8) Get the figure for the output
     fig = catplot.fig
 
-    # 9) Do not modify the next two lines
-    # (The tests expect the function to return the figure)
     return fig
 
 
 def draw_heat_map():
-    # 10) Import the data
+
     df = pd.read_csv("medical_examination.csv")
 
     # Add 'overweight' and normalize 'cholesterol' and 'gluc' as in the cat plot
@@ -60,7 +51,7 @@ def draw_heat_map():
     df['cholesterol'] = (df['cholesterol'] > 1).astype(int)
     df['gluc'] = (df['gluc'] > 1).astype(int)
 
-    # 11) Clean the data
+
     # Keep rows where ap_lo <= ap_hi
     df_heat = df[df['ap_lo'] <= df['ap_hi']].copy()
 
@@ -77,16 +68,12 @@ def draw_heat_map():
         (df_heat['weight'] <= weight_high)
     ].copy()
 
-    # 12) Calculate the correlation matrix
     corr = df_heat.corr()
 
-    # 13) Generate a mask for the upper triangle
     mask = np.triu(np.ones_like(corr, dtype=bool))
 
-    # 14) Set up the matplotlib figure
     fig, ax = plt.subplots(figsize=(12, 10))
 
-    # 15) Draw the heatmap with sns.heatmap()
     sns.heatmap(
         corr,
         mask=mask,
@@ -100,5 +87,4 @@ def draw_heat_map():
         ax=ax
     )
 
-    # 16) Do not modify the next two lines
     return fig
